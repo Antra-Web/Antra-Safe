@@ -1,0 +1,109 @@
+/* ANTRA-WEB — Antra floating website-guide widget
+   ---------------------------------------------------------
+   Global floating chat launcher + panel, loaded on the main
+   marketing pages only (NOT ava.html / flow.html, and NOT
+   inside the Ava/Flow agent-chat components themselves).
+
+   Reuses the existing `.agent-chat` component/engine from
+   css/agent.css + js/agent-chat.js as-is (unmodified) — this
+   file only supplies the floating launcher button and the
+   fixed-position panel shell that houses it.
+
+   Positioning note: the WhatsApp button (`.wa-float`) sits at
+   bottom-left (z-index:200). Antra intentionally sits at
+   bottom-right so the two never overlap on any screen size. */
+
+.antra-float-wrap{
+  position:fixed;
+  right:24px;
+  bottom:24px;
+  z-index:900; /* above wa-float (200), below the portfolio preview modal (1000) */
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:14px;
+  font-family:var(--font-body, 'Inter', sans-serif);
+}
+
+/* ---------- launcher button ---------- */
+.antra-launcher{
+  width:58px;height:58px;border-radius:50%;
+  border:none;cursor:pointer;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,var(--cyan,#4fe3ff),var(--blue,#5a8dff));
+  color:#03131c;
+  box-shadow:0 4px 18px rgba(0,0,0,0.35), 0 0 0 0 rgba(79,227,255,0.5);
+  transition:transform .25s ease, box-shadow .25s ease;
+  animation:antra-pulse 2.8s ease-in-out infinite;
+}
+.antra-launcher:hover{transform:translateY(-3px) scale(1.05);}
+.antra-launcher:focus-visible{outline:2px solid var(--cyan,#4fe3ff);outline-offset:3px;}
+.antra-launcher svg{width:26px;height:26px;position:absolute;transition:opacity .2s ease, transform .2s ease;}
+.antra-launcher .antra-icon-close{opacity:0;transform:scale(.6) rotate(-45deg);}
+.antra-launcher .antra-icon-chat{opacity:1;transform:scale(1) rotate(0deg);}
+.antra-float-wrap.is-open .antra-launcher .antra-icon-chat{opacity:0;transform:scale(.6) rotate(45deg);}
+.antra-float-wrap.is-open .antra-launcher .antra-icon-close{opacity:1;transform:scale(1) rotate(0deg);}
+
+@keyframes antra-pulse{
+  0%,100%{box-shadow:0 4px 18px rgba(0,0,0,0.35), 0 0 0 0 rgba(79,227,255,0.45);}
+  50%{box-shadow:0 4px 18px rgba(0,0,0,0.35), 0 0 0 10px rgba(79,227,255,0);}
+}
+@media(prefers-reduced-motion:reduce){.antra-launcher{animation:none;}}
+
+/* small "ask me" hint chip — purely decorative, hides once opened or dismissed */
+.antra-hint{
+  font-family:var(--font-mono,'JetBrains Mono',monospace);
+  font-size:10.5px;letter-spacing:.6px;color:var(--blue-white,#e8f4ff);
+  background:var(--glass,rgba(16,22,34,0.75));
+  border:1px solid var(--line,rgba(79,227,255,0.16));
+  padding:9px 14px;border-radius:20px;
+  box-shadow:0 6px 20px rgba(0,0,0,0.35);
+  white-space:nowrap;
+  animation:antra-hint-in .4s ease .6s both;
+}
+.antra-float-wrap.is-open .antra-hint,
+.antra-float-wrap.hint-dismissed .antra-hint{display:none;}
+@keyframes antra-hint-in{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+/* ---------- panel shell ---------- */
+.antra-float-panel{
+  width:380px;max-width:calc(100vw - 32px);
+  border-radius:20px;overflow:hidden;
+  box-shadow:0 20px 60px rgba(0,0,0,0.5), 0 0 40px rgba(79,227,255,0.08);
+  transform-origin:bottom right;
+  transform:translateY(16px) scale(.96);
+  opacity:0;
+  transition:transform .22s ease, opacity .22s ease;
+  pointer-events:none;
+}
+.antra-float-wrap.is-open .antra-float-panel{
+  transform:translateY(0) scale(1);
+  opacity:1;
+  pointer-events:auto;
+}
+.antra-float-panel[hidden]{display:none;}
+
+/* constrain the reused .agent-chat component to widget-sized proportions */
+.antra-float-panel .agent-chat{
+  height:min(520px, 70vh);
+  border-radius:20px;
+}
+
+/* extra close (×) button injected into the reused agent-chat-head */
+.antra-close-btn{
+  flex-shrink:0;width:30px;height:30px;border-radius:9px;
+  border:1px solid var(--line,rgba(79,227,255,0.16));background:transparent;
+  color:var(--gray,#8a97ab);cursor:pointer;font-size:13px;line-height:1;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s ease;
+}
+.antra-close-btn:hover{color:var(--cyan,#4fe3ff);border-color:var(--cyan,#4fe3ff);background:rgba(79,227,255,0.06);}
+.antra-close-btn:focus-visible{outline:2px solid var(--cyan,#4fe3ff);outline-offset:2px;}
+
+@media(max-width:640px){
+  .antra-float-wrap{right:16px;bottom:16px;}
+  .antra-launcher{width:52px;height:52px;}
+  .antra-launcher svg{width:23px;height:23px;}
+  .antra-float-panel{width:calc(100vw - 32px);}
+  .antra-float-panel .agent-chat{height:min(72vh, 560px);}
+}
